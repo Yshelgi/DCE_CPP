@@ -66,6 +66,7 @@ void TRTInfer::preprocess(const cv::Mat& image, cv::Size& size){
     cv::cvtColor(nchw, nchw, cv::COLOR_BGR2RGB);
     float* data = new float[nchw.total() * 3];
     blobFromImage(nchw,data);
+    // cv::dnn::blobFromImage(nchw, out, 1 / 255.f, cv::Size(), cv::Scalar(0, 0, 0), true, false, CV_32F);
     this->pparam.height = height;
     this->pparam.width  = width;
     this->context->setInputShape("images", nvinfer1::Dims{4, {1, 3, size.height,size.width}});
