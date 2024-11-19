@@ -43,14 +43,21 @@ Convert the exported `ONNX` model to a `TensorRT` engine file.
 
 ## Result 
 
-<center class="half">
-    <img src="https://s2.loli.net/2024/11/19/uakIBL4Qb5x3zco.jpg" width=300/>
-    <img src="https://s2.loli.net/2024/11/19/fI6ZJnADWvxb58O.jpg" width=300/>
-    <img src="https://s2.loli.net/2024/11/19/NcJG3aEf2tKDkBv.png" width=300/>
-    <img src="https://s2.loli.net/2024/11/19/ASlOEWsfpnFk5MC.jpg" width=300/>
-    <img src="https://s2.loli.net/2024/11/19/YfOGzDg7ZI9yLu2.png" width=300/>
-    <img src="https://s2.loli.net/2024/11/19/vIxc7RktyT6w5dZ.jpg" width=300/>
-</center>
+<table>
+    <tr>
+        <td><img src="https://s2.loli.net/2024/11/19/uakIBL4Qb5x3zco.jpg"/></td>
+        <td><img src="https://s2.loli.net/2024/11/19/fI6ZJnADWvxb58O.jpg"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://s2.loli.net/2024/11/19/NcJG3aEf2tKDkBv.png"/></td>
+        <td><img src="https://s2.loli.net/2024/11/19/ASlOEWsfpnFk5MC.jpg"/></td>
+    </tr>
+    <tr>
+        <td><img src="https://s2.loli.net/2024/11/19/YfOGzDg7ZI9yLu2.png"/></td>
+        <td><img src="https://s2.loli.net/2024/11/19/vIxc7RktyT6w5dZ.jpg"/></td>
+    </tr>
+</table>
+
 
 For more result images, please refer to the `result` folder. The original test images can be found in the `test_imgs` folder.
 
