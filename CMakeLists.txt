@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
 project(DCE_CPP)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "-std=c++17 -O3")
 set(CMAKE_BUILD_TYPE Release)
+
+# Add define to track the time consumed at each step.
+# you can set it or not
+# add_definitions(-DTIMETRACE)
 
 # CUDA
 find_package(CUDA REQUIRED)

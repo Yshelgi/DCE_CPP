@@ -1,7 +1,6 @@
 #include "DCENet.h"
 #include "common.h"
 
-#define TIMETRACE true
 
 DCENet::DCENet(const std::string &enginePath, int deviceId) {
     SetCudaDevice(deviceId);
@@ -67,16 +66,17 @@ void DCENet::postprocess(cv::Mat &image) {
     for(int i=0;i<oh;++i) {
         int index = i*ow;
         for(int j=0;j<ow;++j) {
-            data[(i*ow+j)*3] = std::min(255,int(ptr[index + j + 2 * step]*255));
-            data[(i*ow+j)*3 + 1] = std::min(255,int(ptr[index + j + step]*255));
-            data[(i*ow+j)*3 + 2] = std::min(255,int(ptr[index + j]*255));
+            int tmp = (index+j) * 3;
+            data[tmp] = std::min(255,int(ptr[index + j + 2 * step]*255));
+            data[tmp + 1] = std::min(255,int(ptr[index + j + step]*255));
+            data[tmp + 2] = std::min(255,int(ptr[index + j]*255));
         }
     }
     cv::resize(out,image,cv::Size(dw,dh));
 }
 
 
-void DCENet::run(const cv::Mat &img, cv::Mat &dst,cv::Size size) {
+void DCENet::run(const cv::Mat &img, cv::Mat &dst, cv::Size& size) {
 #ifdef TIMETRACE
     auto st = std::chrono::high_resolution_clock::now();
 #endif

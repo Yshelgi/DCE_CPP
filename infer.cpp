@@ -58,69 +58,14 @@ void blobFromImage(const cv::Mat& img,float* data) {
 }
 
 
-// void blobFromImage(const cv::Mat& img,float* data) {
-//     int img_h = img.rows;
-//     int img_w = img.cols;
-//     int step = img_h * img_w;
-//     const unsigned char* imgData = img.ptr<unsigned char>(0);
-//     for (int h = 0; h < img_h; h++){
-//         int index = h * img_w;
-//         for (int w = 0; w < img_w; w++){
-//             data[index + w] = static_cast<float>(imgData[index * 3 + 3 * w])/255.;
-//             data[index + w + step] = static_cast<float>(imgData[index * 3 + 3 * w + 1])/255.;
-//             data[index + w + step * 2] = static_cast<float>(imgData[index * 3 + 3 * w + 2])/255.;
-//         }
-//     }
-// }
-
-void writeFloatArrayToFile(float* array, size_t length, const std::string& filename) {
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return;
-    }
-
-    // 保留6位小数
-    file << std::fixed << std::setprecision(6);
-
-    for (size_t i = 0; i < length; ++i) {
-        file << array[i];
-        if (i < length - 1) {
-            file << "\t";
-        }
-        if ((i + 1) % 10 == 0) {
-            file << std::endl;
-        }
-    }
-    if ((length + 9) % 10 != 0) {
-        file << std::endl;
-    }
-
-    file.close();
-}
-
-
 void TRTInfer::preprocess(const cv::Mat& image, cv::Size& size){
     float       height = image.rows;
     float       width  = image.cols;
     cv::Mat nchw,out;
     cv::resize(image, nchw, size);
-
-    // auto st = std::chrono::high_resolution_clock::now();
-    // cv::dnn::blobFromImage(nchw, out, 1 / 255.f, cv::Size(), cv::Scalar(0, 0, 0), true, false, CV_32F);
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);
-    // std::cout <<"opencv blob cost: "<< duration.count() << "ms \n";
-    // writeFloatArrayToFile(out.ptr<float>(0), nchw.total() * 3, "../blob.csv");
-
-    // st = std::chrono::high_resolution_clock::now();
     cv::cvtColor(nchw, nchw, cv::COLOR_BGR2RGB);
     float* data = new float[nchw.total() * 3];
     blobFromImage(nchw,data); //speed up
-    // end = std::chrono::high_resolution_clock::now();
-    // duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);
-    // std::cout <<"our blob cost: "<< duration.count() << "ms \n";
-    // writeFloatArrayToFile(data, nchw.total() * 3, "../myblob.csv");
 
     this->pparam.height = height;
     this->pparam.width  = width;
