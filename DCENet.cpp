@@ -1,6 +1,8 @@
 #include "DCENet.h"
 #include "common.h"
 
+#define TIMETRACE true
+
 DCENet::DCENet(const std::string &enginePath, int deviceId) {
     SetCudaDevice(deviceId);
     std::ifstream file(enginePath,std::ios::binary);
@@ -74,26 +76,36 @@ void DCENet::postprocess(cv::Mat &image) {
 }
 
 
-void DCENet::run(const cv::Mat &img, cv::Mat &dst) {
-    cv::Size size(640,640);
+void DCENet::run(const cv::Mat &img, cv::Mat &dst,cv::Size size) {
+#ifdef TIMETRACE
     auto st = std::chrono::high_resolution_clock::now();
+#endif
     preprocess(img,size);
+#ifdef TIMETRACE
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);
     std::cout <<"preprocess cost: "<< duration.count() << "ms \n";
+#endif
 
-
+#ifdef TIMETRACE
     st = std::chrono::high_resolution_clock::now();
+#endif
     infer();
+#ifdef TIMETRACE
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);
     std::cout <<"infer cost: "<< duration.count() << "ms \n";
+#endif
 
+#ifdef TIMETRACE
     st = std::chrono::high_resolution_clock::now();
+#endif
     postprocess(dst);
+#ifdef TIMETRACE
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);
     std::cout <<"postprocess cost: "<< duration.count() << "ms \n";
+#endif
 }
 
 
