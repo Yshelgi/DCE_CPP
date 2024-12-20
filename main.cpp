@@ -32,21 +32,21 @@ std::string enhanceFilePath(const std::string& originalPath) {
     return newPath.string();
 }
 
-void enhanceImg(const std::string& imgPath,int deviceId) {
+void enhanceImg(const std::string& imgPath,const std::string& modelPath,int deviceId) {
     cv::Mat img = cv::imread(imgPath);
     std::string enhance_imgPath = enhanceFilePath(imgPath);
     cv::Mat dst;
-    auto model = new DCENet("../ckpts/DCE_plus2_fp16.engine", deviceId);
+    auto model = new DCENet(modelPath, deviceId);
     model->make_pipe(true);
     model->run(img,dst,defaultSize);
     cv::imwrite(enhance_imgPath,dst);
 }
 
 
-void enhanceVideo(const std::string& videoPath,int deviceId) {
+void enhanceVideo(const std::string& videoPath,const std::string& modelPath,int deviceId) {
     std::string enhance_videoPath = enhanceFilePath(videoPath);
 
-    auto model = new DCENet("../ckpts/DCE_plus2_fp16.engine", deviceId);
+    auto model = new DCENet(modelPath, deviceId);
     model->make_pipe(true);
 
     cv::Mat img,dst;
@@ -84,20 +84,22 @@ int main(int argc,char* argv[]) {
     // 定义cli解析
     cmdline::parser p;
 
-    p.add<std::string>("type",'t',"The type of media type (image/video)",true,"");
-    p.add<std::string>("path",'p',"The path of media",true,"");
+    p.add<std::string>("type",'t',"The type of media type (image/video)",true, "",cmdline::oneof<std::string>("image","video"));
+    p.add<std::string>("mediaPath",'p',"The path of media",true,"");
+    p.add<std::string>("modelPath",'m',"The path of engine model",false,"./ckpts/DCE_plus3_fp16.engine");
     p.add<int>("deviceId",'d',"Select the GPU ID for model inference",false,0);
 
-    p.parse(argc,argv);
+    p.parse_check(argc,argv);
 
     std::string type = p.get<std::string>("type");
-    std::string path = p.get<std::string>("path");
+    std::string path = p.get<std::string>("mediaPath");
+    std::string modelPath = p.get<std::string>("modelPath");
     int deviceId = p.get<int>("deviceId");
 
     if (type == "image") {
-        enhanceImg(path,deviceId);
+        enhanceImg(path,modelPath,deviceId);
     }else if (type == "video") {
-        enhanceVideo(path,deviceId);
+        enhanceVideo(path,modelPath,deviceId);
     }else {
         throw std::runtime_error("Invalid type.");
     }

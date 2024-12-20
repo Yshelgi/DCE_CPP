@@ -46,9 +46,10 @@ void blobFromImage(const cv::Mat& img,float* data) {
     int img_h = img.rows;
     int img_w = img.cols;
     int step = img_h * img_w;
+    int index = 0;
     const unsigned char* imgData = img.ptr<unsigned char>(0);
     for (int h = 0; h < img_h; h++){
-        int index = h * img_w;
+        index = h * img_w;
         for (int w = 0; w < img_w; w++){
             data[index + w] = static_cast<float>(imgData[index * 3 + 3 * w])/255.;
             data[step + index + w] = static_cast<float>(imgData[index * 3 + 3 * w + 1])/255.;

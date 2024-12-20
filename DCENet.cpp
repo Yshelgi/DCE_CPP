@@ -1,6 +1,7 @@
 #include "DCENet.h"
 #include "common.h"
 
+#define V8
 
 DCENet::DCENet(const std::string &enginePath, int deviceId) {
     SetCudaDevice(deviceId);
@@ -25,6 +26,37 @@ DCENet::DCENet(const std::string &enginePath, int deviceId) {
 
     assert(this->context != nullptr);
     cudaStreamCreate(&this->stream);
+
+#ifdef V8
+    this->num_bindings = this->engine->getNbBindings();
+
+    for (int i = 0; i < this->num_bindings; ++i) {
+        Binding            binding;
+        nvinfer1::Dims     dims;
+        nvinfer1::DataType dtype = this->engine->getBindingDataType(i);
+        std::string        name  = this->engine->getBindingName(i);
+        binding.name             = name;
+        binding.dsize            = type_to_size(dtype);
+
+        bool IsInput = engine->bindingIsInput(i);
+        if (IsInput) {
+            this->num_inputs += 1;
+            dims         = this->engine->getProfileDimensions(i, 0, nvinfer1::OptProfileSelector::kMAX);
+            binding.size = get_size_by_dims(dims);
+            binding.dims = dims;
+            this->input_bindings.push_back(binding);
+            // set max opt shape
+            this->context->setBindingDimensions(i, dims);
+        }
+        else {
+            dims         = this->context->getBindingDimensions(i);
+            binding.size = get_size_by_dims(dims);
+            binding.dims = dims;
+            this->output_bindings.push_back(binding);
+            this->num_outputs += 1;
+        }
+    }
+# else
     this->num_bindings = this->engine->getNbIOTensors();
     for (int i = 0; i < this->num_bindings; ++i) {
         Binding            binding;
@@ -49,6 +81,7 @@ DCENet::DCENet(const std::string &enginePath, int deviceId) {
             this->num_outputs += 1;
         }
     }
+#endif
 }
 
 void DCENet::postprocess(cv::Mat &image) {
