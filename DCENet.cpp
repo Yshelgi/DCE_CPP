@@ -70,8 +70,8 @@ DCENet::DCENet(const std::string &enginePath, int deviceId,const cv::Size& imgSi
         if(ioType == nvinfer1::TensorIOMode::kINPUT) {
             this->num_inputs += 1;
             dims = this->engine->getProfileShape(name,0,nvinfer1::OptProfileSelector::kMAX);
-            dims.d[2] = imgSize.height;
-            dims.d[3] = imgSize.width;
+            dims.d[2] = imgSize.width;
+            dims.d[3] = imgSize.height;
             binding.size = get_size_by_dims(dims);
             binding.dims = dims;
             this->input_bindings.push_back(binding);
@@ -88,8 +88,8 @@ DCENet::DCENet(const std::string &enginePath, int deviceId,const cv::Size& imgSi
 
 void DCENet::postprocess(cv::Mat &image) {
     float* ptr = static_cast<float*>(host_ptrs[0]);
-    auto oh = this->output_bindings[0].dims.d[3];
-    auto ow = this->output_bindings[0].dims.d[2];
+    auto oh = this->output_bindings[0].dims.d[2];
+    auto ow = this->output_bindings[0].dims.d[3];
     // auto oh = int(pparam.height);
     // auto ow = int(pparam.width);
     const int step = ow*oh;
