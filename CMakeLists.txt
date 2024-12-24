@@ -30,8 +30,8 @@ message(STATUS "OpenCV Libs: \n${OpenCV_LIBS}\n")
 message(STATUS "OpenCV Libraries: \n${OpenCV_LIBRARIES}\n")
 message(STATUS "OpenCV Headers: \n${OpenCV_INCLUDE_DIRS}\n")
 
-set(TensorRT_ROOT /home/xtxk/TensorRT-8.6.1.6)
-# set(TensorRT_ROOT /home/TensorRT-8.4.2.4)
+set(TensorRT_ROOT /home/xtxk/TensorRT-10.2.0.19)
+# set(TensorRT_ROOT /home/TensorRT10)
 set(TensorRT_INCLUDE_DIRS ${TensorRT_ROOT}/include)
 set(TensorRT_LIBRARIES ${TensorRT_ROOT}/lib)
 

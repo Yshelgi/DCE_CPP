@@ -6,7 +6,7 @@
 #include "cmdline.h"
 
 namespace fs = std::filesystem;
-cv::Size defaultSize = cv::Size(512,512);
+cv::Size maxSize(1920, 1080);
 
 std::string enhanceFilePath(const std::string& originalPath) {
     // 检查路径是否有效
@@ -34,27 +34,53 @@ std::string enhanceFilePath(const std::string& originalPath) {
 
 void enhanceImg(const std::string& imgPath,const std::string& modelPath,int deviceId) {
     cv::Mat img = cv::imread(imgPath);
+    cv::Size defaultSize;
+    bool isResize = false;
+    if (img.cols > 1920 || img.rows > 1080) {
+        defaultSize = maxSize;
+        isResize = true;
+    }else {
+        defaultSize = img.size();
+    }
+
+    auto model = new DCENet(modelPath, deviceId,defaultSize);
+    model->setResize(isResize);
+    model->make_pipe(true);
+
     std::string enhance_imgPath = enhanceFilePath(imgPath);
     cv::Mat dst;
-    auto model = new DCENet(modelPath, deviceId);
-    model->make_pipe(true);
-    model->run(img,dst,defaultSize);
+    float* data = new float[defaultSize.width * defaultSize.height * 3];
+    model->run(img,dst,data,defaultSize);
     cv::imwrite(enhance_imgPath,dst);
+    delete[] data;
+    data = nullptr;
 }
 
 
 void enhanceVideo(const std::string& videoPath,const std::string& modelPath,int deviceId) {
     std::string enhance_videoPath = enhanceFilePath(videoPath);
-
-    auto model = new DCENet(modelPath, deviceId);
-    model->make_pipe(true);
-
     cv::Mat img,dst;
     cv::VideoCapture cap(videoPath);
     int width,height;
     double fps;
     width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
     height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    cv::Size defaultSize;
+    bool isResize = false;
+    if (width > 1920 || height > 1080) {
+        defaultSize = maxSize;
+        isResize = true;
+    }else {
+        defaultSize = cv::Size(width,height);
+    }
+
+    auto model = new DCENet(modelPath, deviceId,defaultSize);
+    model->setResize(isResize);
+    model->make_pipe(true);
+
+    float* data = new float[defaultSize.width * defaultSize.height * 3];
+
     fps = cap.get(cv::CAP_PROP_FPS);
     cv::VideoWriter writer(enhance_videoPath,cv::VideoWriter::fourcc('M', 'P', '4', 'V'),fps,cv::Size(width,height));
     while(true) {
@@ -65,12 +91,14 @@ void enhanceVideo(const std::string& videoPath,const std::string& modelPath,int 
         if(img.empty()) {
             break;
         }
-        model->run(img,dst,defaultSize);
+        model->run(img,dst,data,defaultSize);
         writer.write(dst);
     }
     cv::destroyAllWindows();
     cap.release();
     writer.release();
+    delete[] data;
+    data = nullptr;
 }
 
 void mkdir(std::string dirPath) {

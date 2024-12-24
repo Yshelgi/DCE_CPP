@@ -59,23 +59,17 @@ void blobFromImage(const cv::Mat& img,float* data) {
 }
 
 
-void TRTInfer::preprocess(const cv::Mat& image, cv::Size& size){
-    float       height = image.rows;
-    float       width  = image.cols;
-    cv::Mat nchw,out;
-    cv::resize(image, nchw, size);
-    cv::cvtColor(nchw, nchw, cv::COLOR_BGR2RGB);
-    float* data = new float[nchw.total() * 3];
-    blobFromImage(nchw,data); //speed up
+void TRTInfer::preprocess(const cv::Mat& image, const cv::Mat& nchw,float* data){
+    this->pparam.height = image.rows;
+    this->pparam.width  = image.cols;
 
-    this->pparam.height = height;
-    this->pparam.width  = width;
+    blobFromImage(nchw,data); //speed up
     //this->context->setInputShape("images", nvinfer1::Dims{4, {1, 3, size.height,size.width}});
     SetCudaDevice(this->deviceId);
     CHECK(cudaMemcpyAsync(
         this->device_ptrs[0], data, nchw.total() * 3 * sizeof(float), cudaMemcpyHostToDevice, this->stream));
-    delete[] data;
-    data = nullptr;
+    // delete[] data;
+    // data = nullptr;
 }
 
 void TRTInfer::infer(){
