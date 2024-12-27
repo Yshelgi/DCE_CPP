@@ -51,25 +51,20 @@ void blobFromImage(const cv::Mat& img,float* data) {
     for (int h = 0; h < img_h; h++){
         index = h * img_w;
         for (int w = 0; w < img_w; w++){
-            data[index + w] = static_cast<float>(imgData[index * 3 + 3 * w])/255.;
+            data[index + w] = static_cast<float>(imgData[index * 3 + 3 * w + 2])/255.;
             data[step + index + w] = static_cast<float>(imgData[index * 3 + 3 * w + 1])/255.;
-            data[step * 2 + index + w] = static_cast<float>(imgData[index * 3 + 3 * w + 2])/255.;
+            data[step * 2 + index + w] = static_cast<float>(imgData[index * 3 + 3 * w])/255.;
         }
     }
 }
 
 
-void TRTInfer::preprocess(const cv::Mat& image, const cv::Mat& nchw,float* data){
-    this->pparam.height = image.rows;
-    this->pparam.width  = image.cols;
-
+void TRTInfer::preprocess(const cv::Mat& nchw,float* data){
     blobFromImage(nchw,data); //speed up
     //this->context->setInputShape("images", nvinfer1::Dims{4, {1, 3, size.height,size.width}});
     SetCudaDevice(this->deviceId);
     CHECK(cudaMemcpyAsync(
         this->device_ptrs[0], data, nchw.total() * 3 * sizeof(float), cudaMemcpyHostToDevice, this->stream));
-    // delete[] data;
-    // data = nullptr;
 }
 
 void TRTInfer::infer(){

@@ -6,7 +6,7 @@
 #include "cmdline.h"
 
 namespace fs = std::filesystem;
-cv::Size maxSize(1920, 1080);
+// cv::Size maxSize(1920,1280);
 
 std::string enhanceFilePath(const std::string& originalPath) {
     // 检查路径是否有效
@@ -36,14 +36,16 @@ void enhanceImg(const std::string& imgPath,const std::string& modelPath,int devi
     cv::Mat img = cv::imread(imgPath);
     cv::Size defaultSize;
     bool isResize = false;
-    if (img.cols > 1920 || img.rows > 1080) {
-        defaultSize = maxSize;
+    if (img.cols > 1600 || img.rows > 1200) {
+        defaultSize = cv::Size(img.cols / 3,img.rows / 3);
         isResize = true;
     }else {
         defaultSize = img.size();
     }
 
     auto model = new DCENet(modelPath, deviceId,defaultSize);
+    model->pparam.height = img.rows;
+    model->pparam.width  = img.cols;
     model->setResize(isResize);
     model->make_pipe(true);
 
@@ -68,14 +70,16 @@ void enhanceVideo(const std::string& videoPath,const std::string& modelPath,int 
 
     cv::Size defaultSize;
     bool isResize = false;
-    if (width > 1920 || height > 1080) {
-        defaultSize = maxSize;
+    if (width > 1600 || height > 1200) {
+        defaultSize = cv::Size(width/3,height/3);
         isResize = true;
     }else {
         defaultSize = cv::Size(width,height);
     }
 
     auto model = new DCENet(modelPath, deviceId,defaultSize);
+    model->pparam.height = height;
+    model->pparam.width  = width;
     model->setResize(isResize);
     model->make_pipe(true);
 

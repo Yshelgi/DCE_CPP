@@ -11,6 +11,7 @@ public:
     void setResize(bool flag){isResize = flag;}
 private:
     bool isResize= false;
+    cv::Mat tmp;
 };
 
 

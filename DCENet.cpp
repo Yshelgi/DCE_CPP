@@ -3,6 +3,8 @@
 
 // #define V8
 
+// # define TIMETRACE
+
 DCENet::DCENet(const std::string &enginePath, int deviceId,const cv::Size& imgSize) {
     SetCudaDevice(deviceId);
     std::ifstream file(enginePath,std::ios::binary);
@@ -90,8 +92,6 @@ void DCENet::postprocess(cv::Mat &image) {
     float* ptr = static_cast<float*>(host_ptrs[0]);
     auto oh = this->output_bindings[0].dims.d[2];
     auto ow = this->output_bindings[0].dims.d[3];
-    // auto oh = int(pparam.height);
-    // auto ow = int(pparam.width);
     const int step = ow*oh;
 
     cv::Mat out = cv::Mat::zeros(ow,oh,CV_8UC3);
@@ -120,12 +120,12 @@ void DCENet::run(const cv::Mat &img, cv::Mat &dst, float* data,cv::Size& size) {
 #ifdef TIMETRACE
     auto st = std::chrono::high_resolution_clock::now();
 #endif
-    cv::Mat nchw = img.clone();
     if (isResize) {
-        cv::resize(nchw,nchw,size);
+        cv::resize(img,this->tmp,size);
+    }else {
+        this->tmp = img;
     }
-    cv::cvtColor(nchw,nchw,cv::COLOR_BGR2RGB);
-    preprocess(img,nchw,data);
+    preprocess(this->tmp,data);
 #ifdef TIMETRACE
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - st);

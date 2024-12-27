@@ -13,7 +13,7 @@ public:
     TRTInfer();
     virtual ~TRTInfer();
     void make_pipe(bool warmup = true);
-    virtual void preprocess(const cv::Mat& image, const cv::Mat& nchw,float* data);
+    virtual void preprocess(const cv::Mat& nchw,float* data);
     virtual void infer();
     virtual void postprocess(cv::Mat& image){};
 
