@@ -62,6 +62,19 @@ Convert the exported `ONNX` model to a `TensorRT` engine file.
 For more result images, please refer to the `result` folder. The original test images can be found in the `test_imgs` folder.
 
 
+-------------------------
+## Update 2025.08.19
+  dynamic_onnx:`ckpts/DCE_dynamic.onnx`
+
+  onnx_to_engine:
+  ```bash
+  trtexec2 --onnx=ckpts/DCE_dynamic.onnx \
+  --saveEngine=ckpts/DCE_dynamic_fp16.engine \ 
+  --minShapes=images:1x3x256x256 \
+  --optShapes=images:1x3x512x512 \
+  --maxShapes=images:1x3x1600x1200 \
+  --fp16 --threads
+  ```
 
 ​	
 
